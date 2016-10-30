@@ -98,8 +98,8 @@ template<typename T>
 DenseVector<T>& DenseVector<T>::operator+=(const SparseVector<T>& b) {
     assert(feature_num == b.get_feature_num());
 
-    for (const std::pair<int, T>& entry : b) {
-        vec[entry.first] += entry.second;
+    for (const FeaValPair<T>& entry : b) {
+        vec[entry.fea] += entry.val;
     }
 
     return *this;
@@ -140,8 +140,8 @@ template<typename T>
 DenseVector<T>& DenseVector<T>::operator-=(const SparseVector<T>& b) {
     assert(feature_num == b.get_feature_num());
 
-    for (const std::pair<int, T>& entry : b.vec) {
-        vec[entry.first] -= entry.second;
+    for (const FeaValPair<T>& entry : b.vec) {
+        vec[entry.fea] -= entry.val;
     }
 
     return *this;
@@ -166,8 +166,8 @@ T DenseVector<T>::dot(const SparseVector<T>& b) const {
 
     T res = 0;
 
-    for (const std::pair<int, T>& entry : b) {
-        res += vec[entry.first] * entry.second;
+    for (const FeaValPair<T>& entry : b) {
+        res += vec[entry.fea] * entry.val;
     }
 
     return res;
@@ -193,8 +193,8 @@ T DenseVector<T>::dot_with_intcpt(const SparseVector<T>& b) const {
 
     T res = 0;
 
-    for (const std::pair<int, T>& entry : b) {
-        res += vec[entry.first] * entry.second;
+    for (const FeaValPair<T>& entry : b) {
+        res += vec[entry.fea] * entry.val;
     }
     res += vec[feature_num - 1];
 
@@ -205,8 +205,8 @@ template<typename T>
 SparseVector<T> SparseVector<T>::operator-() const {
     SparseVector<T> res(*this);
 
-    for (std::pair<int, T>& entry : res) {
-        entry.second *= -1;
+    for (FeaValPair<T>& entry : res) {
+        entry.val *= -1;
     }
 
     return res;
@@ -216,8 +216,8 @@ template<typename T>
 SparseVector<T> SparseVector<T>::operator*(T c) const {
     SparseVector<T> res(*this);
 
-    for (std::pair<int, T>& entry : res) {
-        entry.second *= c;
+    for (FeaValPair<T>& entry : res) {
+        entry.val *= c;
     }
 
     return res;
@@ -228,7 +228,7 @@ SparseVector<T> SparseVector<T>::scalar_multiple_with_intcpt(T c) const {
     SparseVector<T> res(feature_num + 1);
 
     for (const auto& entry : vec) {
-        res.vec.emplace_back(entry.first, c * entry.second);
+        res.vec.emplace_back(entry.fea, c * entry.val);
     }
     res.vec.emplace_back(feature_num, c);
 
@@ -237,8 +237,8 @@ SparseVector<T> SparseVector<T>::scalar_multiple_with_intcpt(T c) const {
 
 template<typename T>
 SparseVector<T>& SparseVector<T>::operator*=(T c) {
-    for (std::pair<int, T>& entry : vec) {
-        entry.second *= c;
+    for (FeaValPair<T>& entry : vec) {
+        entry.val *= c;
     }
 
     return *this;
@@ -248,8 +248,8 @@ template<typename T>
 SparseVector<T> SparseVector<T>::operator/(T c) const {
     SparseVector<T> res(*this);
 
-    for (std::pair<int, T>& entry : res) {
-        entry.second /= c;
+    for (FeaValPair<T>& entry : res) {
+        entry.val /= c;
     }
 
     return res;
@@ -257,8 +257,8 @@ SparseVector<T> SparseVector<T>::operator/(T c) const {
 
 template<typename T>
 SparseVector<T>& SparseVector<T>::operator/=(T c) {
-    for (std::pair<int, T>& entry : vec) {
-        entry.second /= c;
+    for (FeaValPair<T>& entry : vec) {
+        entry.val /= c;
     }
 
     return *this;
@@ -271,7 +271,7 @@ DenseVector<T> SparseVector<T>::operator+(const SparseVector<T>& b) const {
     DenseVector<T> res(*this);
 
     for (const auto& entry : b.vec) {
-        res[entry.first] += entry.second;
+        res[entry.fea] += entry.val;
     }
 
     return res;
@@ -283,8 +283,8 @@ DenseVector<T> SparseVector<T>::operator-(const DenseVector<T>& b) const {
 
     DenseVector<T> res(std::move(-b));
 
-    for (const std::pair<int, T>& entry : vec) {
-        res[entry.first] += entry.second;
+    for (const FeaValPair<T>& entry : vec) {
+        res[entry.fea] += entry.val;
     }
 
     return res;
@@ -297,7 +297,7 @@ DenseVector<T> SparseVector<T>::operator-(const SparseVector<T>& b) const {
     DenseVector<T> res(*this);
 
     for (const auto& entry : b.vec) {
-        res[entry.first] -= entry.second;
+        res[entry.fea] -= entry.val;
     }
 
     return res;
@@ -310,10 +310,10 @@ T SparseVector<T>::dot_with_intcpt(const DenseVector<T>& b) const {
     T res = 0;
 
     for (const auto& entry : vec) {
-        if (entry.first < feature_num - 1) {
-            res += entry.second * vec[entry.first];
+        if (entry.fea < feature_num - 1) {
+            res += entry.val * vec[entry.fea];
         } else {
-            res += entry.second;
+            res += entry.val;
         }
     }
 

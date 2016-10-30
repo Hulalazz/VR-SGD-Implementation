@@ -16,12 +16,108 @@ template<typename T>
 using DenseVector = Vector<T, false>;
 
 template<typename T>
+struct FeaValPair {
+    FeaValPair(int fea, T val) : fea(fea), val(val) {}
+    // TODO: I want fea to be a const, but this will make operator=() unavailable and break the use of STL containers
+    int fea;
+    T val;
+};
+
+template<typename T>
 class Vector<T, false> {
 public:
     typedef typename std::vector<T>::iterator Iterator;
     typedef typename std::vector<T>::const_iterator ConstIterator;
     typedef typename std::vector<T>::iterator ValueIterator;
     typedef typename std::vector<T>::const_iterator ConstValueIterator;
+
+    class FeaValIterator {
+    public:
+        FeaValIterator(std::vector<T>& vec) : idx(0), vec(vec) {}
+        FeaValIterator(std::vector<T>& vec, int idx) : idx(idx), vec(vec) {}
+
+        FeaValPair<T&> operator*() {
+            return FeaValPair<T&>(idx, vec[idx]);
+        }
+
+        FeaValIterator& operator++() {
+            idx++;
+            return *this;
+        }
+
+        FeaValIterator& operator--() {
+            idx--;
+            return *this;
+        }
+
+        FeaValIterator operator++(int) {
+            FeaValIterator it(*this);
+            idx++;
+            return it;
+        }
+
+        FeaValIterator operator--(int) {
+            FeaValIterator it(*this);
+            idx--;
+            return it;
+        }
+
+        bool operator==(const FeaValIterator& b) const {
+            return idx == b.idx;
+        }
+
+        bool operator!=(const FeaValIterator& b) const {
+            return idx != b.idx;
+        }
+
+    private:
+        int idx;
+        std::vector<T>& vec;
+    };
+
+    class ConstFeaValIterator {
+    public:
+        ConstFeaValIterator(const std::vector<T>& vec) : idx(0), vec(vec) {}
+        ConstFeaValIterator(const std::vector<T>& vec, int idx) : idx(idx), vec(vec) {}
+
+        FeaValPair<const T&> operator*() const {
+            return FeaValPair<const T&>(idx, vec[idx]);
+        }
+
+        ConstFeaValIterator& operator++() {
+            idx++;
+            return *this;
+        }
+
+        ConstFeaValIterator& operator--() {
+            idx--;
+            return *this;
+        }
+
+        ConstFeaValIterator operator++(int) {
+            ConstFeaValIterator it(*this);
+            idx++;
+            return it;
+        }
+
+        ConstFeaValIterator operator--(int) {
+            ConstFeaValIterator it(*this);
+            idx--;
+            return it;
+        }
+
+        bool operator==(const ConstFeaValIterator& b) const {
+            return idx == b.idx;
+        }
+
+        bool operator!=(const ConstFeaValIterator& b) const {
+            return idx != b.idx;
+        }
+
+    private:
+        int idx;
+        const std::vector<T>& vec;
+    };
 
     Vector<T, false>(int feature_num)
         : feature_num(feature_num),
@@ -31,7 +127,7 @@ public:
         : feature_num(b.get_feature_num()),
           vec(b.get_feature_num()) {
         for (auto entry : b) {
-            vec[entry.first] = entry.second;
+            vec[entry.fea] = entry.val;
         }
 
     }
@@ -70,6 +166,22 @@ public:
 
     inline ConstValueIterator end_value() const {
         return vec.end();
+    }
+
+    inline FeaValIterator begin_feaval() {
+        return FeaValIterator(vec, 0);
+    }
+
+    inline ConstFeaValIterator begin_feaval() const {
+        return ConstFeaValIterator(vec, 0);
+    }
+
+    inline FeaValIterator end_feaval() {
+        return FeaValIterator(vec, feature_num);
+    }
+
+    inline ConstFeaValIterator end_feaval() const {
+        return ConstFeaValIterator(vec, feature_num);
     }
 
     inline T& operator[](int idx) {
@@ -128,20 +240,22 @@ private:
 template<typename T>
 class Vector<T, true> {
 public:
-    typedef typename std::vector<std::pair<int, T>>::iterator Iterator;
-    typedef typename std::vector<std::pair<int, T>>::const_iterator ConstIterator;
+    typedef typename std::vector<FeaValPair<T>>::iterator Iterator;
+    typedef typename std::vector<FeaValPair<T>>::const_iterator ConstIterator;
+    typedef typename std::vector<FeaValPair<T>>::iterator FeaValIterator;
+    typedef typename std::vector<FeaValPair<T>>::const_iterator ConstFeaValIterator;
 
     class ValueIterator {
     public:
-        ValueIterator(std::vector<std::pair<int, T>>& vec) : idx(0), vec(vec) {}
-        ValueIterator(std::vector<std::pair<int, T>>& vec, int idx) : idx(idx), vec(vec) {}
+        ValueIterator(std::vector<FeaValPair<T>>& vec) : idx(0), vec(vec) {}
+        ValueIterator(std::vector<FeaValPair<T>>& vec, int idx) : idx(idx), vec(vec) {}
 
         T& operator*() {
-            return vec[idx].second;
+            return vec[idx].val;
         }
 
         T* operator->() {
-            return &(vec[idx].second);
+            return &(vec[idx].val);
         }
 
         ValueIterator& operator++() {
@@ -176,20 +290,20 @@ public:
 
     private:
         int idx;
-        std::vector<std::pair<int, T>>& vec;
+        std::vector<FeaValPair<T>>& vec;
     };
 
     class ConstValueIterator {
     public:
-        ConstValueIterator(const std::vector<std::pair<int, T>>& vec) : idx(0), vec(vec) {}
-        ConstValueIterator(const std::vector<std::pair<int, T>>& vec, int idx) : idx(idx), vec(vec) {}
+        ConstValueIterator(const std::vector<FeaValPair<T>>& vec) : idx(0), vec(vec) {}
+        ConstValueIterator(const std::vector<FeaValPair<T>>& vec, int idx) : idx(idx), vec(vec) {}
 
         const T& operator*() const {
-            return vec[idx].second;
+            return vec[idx].val;
         }
 
         const T* operator->() const {
-            return &(vec[idx].second);
+            return &(vec[idx].val);
         }
 
         ConstValueIterator& operator++() {
@@ -224,7 +338,7 @@ public:
 
     private:
         int idx;
-        const std::vector<std::pair<int, T>>& vec;
+        const std::vector<FeaValPair<T>>& vec;
     };
 
     Vector<T, true>(int feature_num)
@@ -266,13 +380,29 @@ public:
         return ConstValueIterator(vec, vec.size());
     }
 
-    // TODO: how to make the following function available?
+    inline FeaValIterator begin_feaval() {
+        return vec.begin();
+    }
+
+    inline ConstFeaValIterator begin_feaval() const {
+        return vec.begin();
+    }
+
+    inline FeaValIterator end_feaval() {
+        return vec.end();
+    }
+
+    inline ConstFeaValIterator end_feaval() const {
+        return vec.end();
+    }
+
+    // TODO: how to make the following function available, or is it really needed?
     /*inline void set(int idx, const T& val) {
-        vec.push_back(std::move(std::make_pair(idx, val)));
+        vec.emplace_back(idx, val);
     }*/
 
     inline void set(int idx, T val) {
-        vec.push_back(std::move(std::make_pair(idx, std::move(val))));
+        vec.emplace_back(idx, std::move(val));
     }
 
     SparseVector<T> operator-() const;
@@ -306,7 +436,7 @@ public:
     }
 
 private:
-    std::vector<std::pair<int, T>> vec;
+    std::vector<FeaValPair<T>> vec;
     int feature_num;
 };
 
