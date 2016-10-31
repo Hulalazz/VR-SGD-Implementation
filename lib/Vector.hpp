@@ -129,8 +129,11 @@ public:
         for (auto entry : b) {
             vec[entry.fea] = entry.val;
         }
-
     }
+
+    Vector<T, false>(int feature_num, T& val)
+        : feature_num(feature_num),
+          vec(feature_num, val) {}
 
     inline int get_feature_num() const {
         return feature_num;
