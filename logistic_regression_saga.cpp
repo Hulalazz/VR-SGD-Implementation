@@ -58,9 +58,6 @@ int main() {
 
     printf("L: %.15lf\n", calc_L(data_points));
 
-    typedef VRSGD::DenseVector<double>(*ProxFunc)(const VRSGD::DenseVector<double>&, double, double);
-    ProxFunc prox_func = VRSGD::prox_l1<double>;
-
     VRSGD::saga_train<double, double, is_sparse>(
             data_points,
             alpha,
@@ -69,8 +66,8 @@ int main() {
             1000000,
             feature_num + 1,
             100,
-            std::function<double(const VRSGD::DenseVector<double>&, const std::vector<VRSGD::DataPoint<double, double, is_sparse>>&)>(logistic_regression_cost_func<is_sparse>),
-            std::function<VRSGD::Vector<double, is_sparse>(const VRSGD::DenseVector<double>&, const VRSGD::DataPoint<double, double, is_sparse>&)>(logistic_regression_grad<is_sparse>),
-            prox_func);
+            logistic_regression_cost_func<is_sparse>,
+            logistic_regression_grad<is_sparse>,
+            VRSGD::prox_l1<double, false>);
 }
 
