@@ -1,6 +1,6 @@
 #include <cassert>
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::operator-() const {
     DenseVector<T> res(*this);
 
@@ -11,7 +11,7 @@ DenseVector<T> DenseVector<T>::operator-() const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::operator*(T c) const {
     DenseVector<T> res(feature_num);
 
@@ -22,7 +22,7 @@ DenseVector<T> DenseVector<T>::operator*(T c) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::scalar_multiple_with_intcpt(T c) const {
     DenseVector<T> res(feature_num + 1);
 
@@ -34,7 +34,7 @@ DenseVector<T> DenseVector<T>::scalar_multiple_with_intcpt(T c) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T>& DenseVector<T>::operator*=(T c) {
     for (int i = 0; i < feature_num; i++) {
         vec[i] *= c;
@@ -43,7 +43,7 @@ DenseVector<T>& DenseVector<T>::operator*=(T c) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::operator/(T c) const {
     DenseVector<T> res(feature_num);
 
@@ -54,7 +54,7 @@ DenseVector<T> DenseVector<T>::operator/(T c) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T>& DenseVector<T>::operator/=(T c) {
     for (int i = 0; i < feature_num; i++) {
         vec[i] /= c;
@@ -63,7 +63,7 @@ DenseVector<T>& DenseVector<T>::operator/=(T c) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::operator+(const DenseVector<T>& b) const {
     assert(feature_num == b.feature_num);
 
@@ -76,7 +76,7 @@ DenseVector<T> DenseVector<T>::operator+(const DenseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T>& DenseVector<T>::operator+=(const DenseVector<T>& b) {
     assert(feature_num == b.feature_num);
 
@@ -87,14 +87,14 @@ DenseVector<T>& DenseVector<T>::operator+=(const DenseVector<T>& b) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::operator+(const SparseVector<T>& b) const {
     DenseVector<T> res(*this);
     res += b;
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T>& DenseVector<T>::operator+=(const SparseVector<T>& b) {
     assert(feature_num == b.get_feature_num());
 
@@ -105,7 +105,7 @@ DenseVector<T>& DenseVector<T>::operator+=(const SparseVector<T>& b) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::operator-(const DenseVector<T>& b) const {
     assert(feature_num == b.feature_num);
 
@@ -118,7 +118,7 @@ DenseVector<T> DenseVector<T>::operator-(const DenseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T>& DenseVector<T>::operator-=(const DenseVector<T>& b) {
     assert(feature_num == b.feature_num);
 
@@ -129,14 +129,14 @@ DenseVector<T>& DenseVector<T>::operator-=(const DenseVector<T>& b) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> DenseVector<T>::operator-(const SparseVector<T>& b) const {
     DenseVector<T> res(*this);
     res -= b;
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T>& DenseVector<T>::operator-=(const SparseVector<T>& b) {
     assert(feature_num == b.get_feature_num());
 
@@ -147,7 +147,7 @@ DenseVector<T>& DenseVector<T>::operator-=(const SparseVector<T>& b) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 T DenseVector<T>::dot(const DenseVector<T>& b) const {
     assert(feature_num == b.feature_num);
 
@@ -160,7 +160,7 @@ T DenseVector<T>::dot(const DenseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 T DenseVector<T>::dot(const SparseVector<T>& b) const {
     assert(feature_num == b.get_feature_num());
 
@@ -173,7 +173,7 @@ T DenseVector<T>::dot(const SparseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 T DenseVector<T>::dot_with_intcpt(const DenseVector<T>& b) const {
     assert(feature_num == b.feature_num + 1);
 
@@ -187,7 +187,7 @@ T DenseVector<T>::dot_with_intcpt(const DenseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 T DenseVector<T>::dot_with_intcpt(const SparseVector<T>& b) const {
     assert(feature_num == b.get_feature_num() + 1);
 
@@ -201,7 +201,7 @@ T DenseVector<T>::dot_with_intcpt(const SparseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 SparseVector<T> SparseVector<T>::operator-() const {
     SparseVector<T> res(*this);
 
@@ -212,7 +212,7 @@ SparseVector<T> SparseVector<T>::operator-() const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 SparseVector<T> SparseVector<T>::operator*(T c) const {
     SparseVector<T> res(*this);
 
@@ -223,7 +223,7 @@ SparseVector<T> SparseVector<T>::operator*(T c) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 SparseVector<T> SparseVector<T>::scalar_multiple_with_intcpt(T c) const {
     SparseVector<T> res(feature_num + 1);
 
@@ -235,7 +235,7 @@ SparseVector<T> SparseVector<T>::scalar_multiple_with_intcpt(T c) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 SparseVector<T>& SparseVector<T>::operator*=(T c) {
     for (FeaValPair<T>& entry : vec) {
         entry.val *= c;
@@ -244,7 +244,7 @@ SparseVector<T>& SparseVector<T>::operator*=(T c) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 SparseVector<T> SparseVector<T>::operator/(T c) const {
     SparseVector<T> res(*this);
 
@@ -255,7 +255,7 @@ SparseVector<T> SparseVector<T>::operator/(T c) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 SparseVector<T>& SparseVector<T>::operator/=(T c) {
     for (FeaValPair<T>& entry : vec) {
         entry.val /= c;
@@ -264,7 +264,7 @@ SparseVector<T>& SparseVector<T>::operator/=(T c) {
     return *this;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> SparseVector<T>::operator+(const SparseVector<T>& b) const {
     assert(feature_num == b.feature_num);
 
@@ -277,7 +277,7 @@ DenseVector<T> SparseVector<T>::operator+(const SparseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> SparseVector<T>::operator-(const DenseVector<T>& b) const {
     assert(feature_num == b.get_feature_num());
 
@@ -290,7 +290,7 @@ DenseVector<T> SparseVector<T>::operator-(const DenseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 DenseVector<T> SparseVector<T>::operator-(const SparseVector<T>& b) const {
     assert(feature_num == b.feature_num);
 
@@ -303,7 +303,7 @@ DenseVector<T> SparseVector<T>::operator-(const SparseVector<T>& b) const {
     return res;
 }
 
-template<typename T>
+template <typename T>
 T SparseVector<T>::dot_with_intcpt(const DenseVector<T>& b) const {
     assert(feature_num == b.get_feature_num() + 1);
 

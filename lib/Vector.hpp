@@ -6,16 +6,16 @@
 
 namespace VRSGD {
 
-template<typename T, bool is_sparse>
+template <typename T, bool is_sparse>
 class Vector;
 
-template<typename T>
+template <typename T>
 using SparseVector = Vector<T, true>;
 
-template<typename T>
+template <typename T>
 using DenseVector = Vector<T, false>;
 
-template<typename T>
+template <typename T>
 struct FeaValPair {
     FeaValPair(int fea, T val) : fea(fea), val(val) {}
     // TODO: I want fea to be a const, but this will make operator=() unavailable and break the use of STL containers
@@ -23,7 +23,7 @@ struct FeaValPair {
     T val;
 };
 
-template<typename T>
+template <typename T>
 class Vector<T, false> {
 public:
     typedef typename std::vector<T>::iterator Iterator;
@@ -119,7 +119,9 @@ public:
         const std::vector<T>& vec;
     };
 
-    Vector<T, false>(int feature_num)
+    Vector<T, false>() : feature_num(0) {}
+
+    explicit Vector<T, false>(int feature_num)
         : feature_num(feature_num),
           vec(feature_num) {}
 
@@ -240,7 +242,7 @@ private:
     int feature_num;
 };
 
-template<typename T>
+template <typename T>
 class Vector<T, true> {
 public:
     typedef typename std::vector<FeaValPair<T>>::iterator Iterator;
@@ -344,7 +346,9 @@ public:
         const std::vector<FeaValPair<T>>& vec;
     };
 
-    Vector<T, true>(int feature_num)
+    Vector<T, true>() : feature_num(0) {}
+
+    explicit Vector<T, true>(int feature_num)
         : feature_num(feature_num) {}
 
     inline int get_feature_num() const {
@@ -443,19 +447,19 @@ private:
     int feature_num;
 };
 
-template<typename T>
+template <typename T>
 inline DenseVector<T> operator*(T c, const DenseVector<T>& a) {
     return a * c;
 }
 
-template<typename T>
+template <typename T>
 inline SparseVector<T> operator*(T c, const SparseVector<T>& a) {
     return a * c;
 }
 
-template<typename T, typename U, bool is_sparse>
+template <typename T, typename U, bool is_sparse>
 struct DataPoint {
-    DataPoint(int feature_num) : x(feature_num) {}
+    explicit DataPoint(int feature_num) : x(feature_num) {}
     Vector<T, is_sparse> x;
     U y;
 };
