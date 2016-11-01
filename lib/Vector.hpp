@@ -133,7 +133,11 @@ public:
         }
     }
 
-    Vector<T, false>(int feature_num, T& val)
+    Vector<T, false>(int feature_num, const T& val)
+        : feature_num(feature_num),
+          vec(feature_num, val) {}
+
+    Vector<T, false>(int feature_num, T&& val)
         : feature_num(feature_num),
           vec(feature_num, val) {}
 
@@ -197,12 +201,11 @@ public:
         return vec[idx];
     }
 
-    // TODO: how to make the following function available?
-    /*inline void set(int idx, const T& val) {
+    inline void set(int idx, const T& val) {
         vec[idx] = val;
-    }*/
+    }
 
-    inline void set(int idx, T val) {
+    inline void set(int idx, T&& val) {
         vec[idx] = std::move(val);
     }
 
@@ -403,12 +406,11 @@ public:
         return vec.end();
     }
 
-    // TODO: how to make the following function available, or is it really needed?
-    /*inline void set(int idx, const T& val) {
+    inline void set(int idx, const T& val) {
         vec.emplace_back(idx, val);
-    }*/
+    }
 
-    inline void set(int idx, T val) {
+    inline void set(int idx, T&& val) {
         vec.emplace_back(idx, std::move(val));
     }
 
