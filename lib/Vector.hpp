@@ -63,11 +63,11 @@ public:
         }
 
         bool operator==(const FeaValIterator& b) const {
-            return idx == b.idx;
+            return idx == b.idx && &vec == &(b.vec);
         }
 
         bool operator!=(const FeaValIterator& b) const {
-            return idx != b.idx;
+            return idx != b.idx || &vec != &(b.vec);
         }
 
     private:
@@ -107,11 +107,11 @@ public:
         }
 
         bool operator==(const ConstFeaValIterator& b) const {
-            return idx == b.idx;
+            return idx == b.idx && &vec == &(b.vec);
         }
 
         bool operator!=(const ConstFeaValIterator& b) const {
-            return idx != b.idx;
+            return idx != b.idx || &vec != &(b.vec);
         }
 
     private:
@@ -286,11 +286,11 @@ public:
         }
 
         bool operator==(const ValueIterator& b) const {
-            return idx == b.idx;
+            return idx == b.idx && &vec == &(b.vec);
         }
 
         bool operator!=(const ValueIterator& b) const {
-            return idx != b.idx;
+            return idx != b.idx || &vec != &(b.vec);
         }
 
     private:
@@ -334,11 +334,11 @@ public:
         }
 
         bool operator==(const ConstValueIterator& b) const {
-            return idx == b.idx;
+            return idx == b.idx && &vec == &(b.vec);
         }
 
         bool operator!=(const ConstValueIterator& b) const {
-            return idx != b.idx;
+            return idx != b.idx || &vec != &(b.vec);
         }
 
     private:
