@@ -9,8 +9,8 @@
 namespace VRSGD {
 
 template<typename T, typename U, bool is_sparse>
-void saga_train(std::vector<DataPoint<T, U, is_sparse>>& data_points, double alpha, double lambda, int batch_size, int num_iter, int w_feature_num, int sample_period, std::function<T(const DenseVector<T>&, const std::vector<DataPoint<T, U,  is_sparse>>&)> cost_func, std::function<Vector<T, is_sparse>(const DenseVector<T>&, const DataPoint<T, U, is_sparse>&)> grad_func, std::function<DenseVector<T>(const DenseVector<T>&, T, T)> prox_func) {
-    typedef DataPoint<T, U, is_sparse> DataPoint_;
+void saga_train(std::vector<LabeledPoint<Vector<T, is_sparse>, U>>& data_points, double alpha, double lambda, int batch_size, int num_iter, int w_feature_num, int sample_period, std::function<T(const DenseVector<T>&, const std::vector<LabeledPoint<Vector<T, is_sparse>, U>>&)> cost_func, std::function<Vector<T, is_sparse>(const DenseVector<T>&, const LabeledPoint<Vector<T, is_sparse>, U>&)> grad_func, std::function<DenseVector<T>(const DenseVector<T>&, T, T)> prox_func) {
+    typedef LabeledPoint<Vector<T, is_sparse>, U> LabeledPoint_;
     typedef Vector<T, is_sparse> Vector_data;
 
     std::random_device rd;
@@ -40,7 +40,7 @@ void saga_train(std::vector<DataPoint<T, U, is_sparse>>& data_points, double alp
 
         for (int j = 0; j < batch_size; j++) {
             int rand_row = dis_num_sample(gen);
-            DataPoint_& data_point = data_points[rand_row];
+            LabeledPoint_& data_point = data_points[rand_row];
 
             auto grad = grad_func(w, data_point);
             batch_table.emplace_back(rand_row, grad);

@@ -1,4 +1,4 @@
-#include <lib/Vector.hpp>
+#include <lib/vector.hpp>
 #include <lib/utils.hpp>
 #include <lib/prox.hpp>
 #include <algo/saga.hpp>
@@ -11,7 +11,7 @@ double logistic_regression_func(const VRSGD::DenseVector<double>& w, const VRSGD
 }
 
 template<bool is_sparse>
-double logistic_regression_cost_func(const VRSGD::DenseVector<double>& w, const std::vector<VRSGD::DataPoint<double, double, is_sparse>>& data_points) {
+double logistic_regression_cost_func(const VRSGD::DenseVector<double>& w, const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points) {
     double res = 0;
     for (auto& data_point : data_points) {
         double tmp = logistic_regression_func(w, data_point.x) - data_point.y;
@@ -21,12 +21,12 @@ double logistic_regression_cost_func(const VRSGD::DenseVector<double>& w, const 
 }
 
 template<bool is_sparse>
-VRSGD::Vector<double, is_sparse> logistic_regression_grad(const VRSGD::DenseVector<double>& w, const VRSGD::DataPoint<double, double, is_sparse>& data_point) {
+VRSGD::Vector<double, is_sparse> logistic_regression_grad(const VRSGD::DenseVector<double>& w, const VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>& data_point) {
     return data_point.x.scalar_multiple_with_intcpt(logistic_regression_func(w, data_point.x) - data_point.y);
 }
 
 template<bool is_sparse>
-double calc_L(const std::vector<VRSGD::DataPoint<double, double, is_sparse>>& data_points) {
+double calc_L(const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points) {
     double max_L = std::sqrt(data_points[0].x.dot(data_points[0].x) + 1);
 
     for (auto& data_point : data_points) {
@@ -46,7 +46,7 @@ int main() {
     const double alpha = 0.085;
     const double lambda = 0.001/123.;
 
-    std::vector<VRSGD::DataPoint<double, double, is_sparse>> data_points;
+    std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>> data_points;
     VRSGD::read_libsvm(data_points, "./datasets/a9a", 123);
 
     for (auto& entry : data_points) {

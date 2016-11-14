@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector.hpp"
+#include "vector.hpp"
 
 #include <boost/tokenizer.hpp>
 
@@ -11,7 +11,7 @@
 namespace VRSGD {
 
 template<typename T, typename U, bool is_sparse>
-void read_libsvm(std::vector<DataPoint<T, U, is_sparse>>& data_points, std::string filename, int feature_num) {
+void read_libsvm(std::vector<LabeledPoint<Vector<T, is_sparse>, U>>& data_points, std::string filename, int feature_num) {
     std::fstream fs(filename, std::fstream::in);
 
     while (!fs.eof()) {
@@ -21,7 +21,7 @@ void read_libsvm(std::vector<DataPoint<T, U, is_sparse>>& data_points, std::stri
             continue;
         }
 
-        DataPoint<T, U, is_sparse> data_point(feature_num);
+        LabeledPoint<Vector<T, is_sparse>, U> data_point(Vector<T, is_sparse>(feature_num), 0);
 
         boost::char_separator<char> sep(" \t");
         boost::tokenizer<boost::char_separator<char>> tok(line, sep);
