@@ -22,6 +22,10 @@ void saga_train(std::vector<LabeledPoint<Vector<T, is_sparse>, U>>& data_points,
     std::vector<Vector_data> table;
     DenseVector<T> w(w_feature_num);
 
+    DenseVector<T> batch_w_change(w_feature_num);
+    std::vector<std::pair<int, Vector_data>> batch_table;
+    DenseVector<T> table_sum_change(w_feature_num);
+
     int data_num = data_points.size();
     for (int i = 0; i < data_num; i++) {
         table.emplace_back(grad_func(w, data_points[i]));
@@ -34,9 +38,9 @@ void saga_train(std::vector<LabeledPoint<Vector<T, is_sparse>, U>>& data_points,
             printf("%d %.15f\n", i, cost_func(w, data_points));
         }
 
-        DenseVector<T> batch_w_change(w_feature_num);
-        std::vector<std::pair<int, Vector_data>> batch_table;
-        DenseVector<T> table_sum_change(w_feature_num);
+        batch_w_change.set_zero();
+        batch_table.clear();
+        table_sum_change.set_zero();
 
         for (int j = 0; j < batch_size; j++) {
             int rand_row = dis_num_sample(gen);

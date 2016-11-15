@@ -1,7 +1,7 @@
 #include <lib/vector.hpp>
 #include <lib/utils.hpp>
 #include <lib/prox.hpp>
-#include <algo/saga.hpp>
+#include <algo/svrg.hpp>
 
 #include <cmath>
 
@@ -58,13 +58,15 @@ int main() {
 
     printf("L: %.15lf\n", calc_L(data_points));
 
-    VRSGD::saga_train<double, double, is_sparse>(
+    VRSGD::svrg_train<double, double, is_sparse>(
             data_points,
             alpha,
             lambda,
             1,
-            100 * 2 * data_points.size(),
+            100,
+            2 * data_points.size(),
             feature_num + 1,
+            0,
             100,
             logistic_regression_cost_func<is_sparse>,
             logistic_regression_grad<is_sparse>,

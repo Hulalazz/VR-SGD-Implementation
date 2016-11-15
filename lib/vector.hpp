@@ -176,6 +176,8 @@ class Vector<T, false> {
 
     inline void set(int idx, T&& val) { vec[idx] = std::move(val); }
 
+    inline void set_zero() { std::fill(vec.begin(), vec.end(), 0); }
+
     DenseVector<T> operator-() const;
 
     DenseVector<T> operator*(T) const;
@@ -335,6 +337,8 @@ class Vector<T, true> {
     inline void set(int idx, const T& val) { vec.emplace_back(idx, val); }
 
     inline void set(int idx, T&& val) { vec.emplace_back(idx, std::move(val)); }
+
+    inline void set_zero() { vec.clear(); }
 
     SparseVector<T> operator-() const;
 
