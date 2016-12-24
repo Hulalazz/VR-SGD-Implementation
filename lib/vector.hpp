@@ -55,24 +55,24 @@ class Vector<T, false> {
         FeaValPair<T&> operator*() { return FeaValPair<T&>(idx, vec[idx]); }
 
         FeaValIterator& operator++() {
-            idx++;
+            ++idx;
             return *this;
         }
 
         FeaValIterator& operator--() {
-            idx--;
+            --idx;
             return *this;
         }
 
         FeaValIterator operator++(int) {
             FeaValIterator it(*this);
-            idx++;
+            ++idx;
             return it;
         }
 
         FeaValIterator operator--(int) {
             FeaValIterator it(*this);
-            idx--;
+            --idx;
             return it;
         }
 
@@ -172,6 +172,8 @@ class Vector<T, false> {
         feature_num = size;
     }
 
+    inline int size() const { return feature_num; }
+
     inline void set(int idx, const T& val) { vec[idx] = val; }
 
     inline void set(int idx, T&& val) { vec[idx] = std::move(val); }
@@ -203,6 +205,14 @@ class Vector<T, false> {
     T dot_with_intcpt(const DenseVector<T>&) const;
     T dot_with_intcpt(const SparseVector<T>&) const;
 
+    inline T norm_sqr() const {
+        return (*this).dot(*this);
+    }
+
+    inline T norm() const {
+        return std::sqrt(norm_sqr());
+    }
+
     template <bool is_sparse>
     inline T euclid_dist(const Vector<T, is_sparse>& b) const {
         DenseVector<T> diff = *this - b;
@@ -211,6 +221,7 @@ class Vector<T, false> {
 
    private:
     std::vector<T> vec;
+    //T* vec;
     int feature_num;
 };
 
@@ -334,9 +345,19 @@ class Vector<T, true> {
 
     inline void resize(int size) { feature_num = size; }
 
-    inline void set(int idx, const T& val) { vec.emplace_back(idx, val); }
+    inline int size() const { return feature_num; }
 
-    inline void set(int idx, T&& val) { vec.emplace_back(idx, std::move(val)); }
+    inline void set(int idx, const T& val) {
+        if (val != 0) {
+            vec.emplace_back(idx, val);
+        }
+    }
+
+    inline void set(int idx, T&& val) {
+        if (val != 0) {
+            vec.emplace_back(idx, std::move(val));
+        }
+    }
 
     inline void set_zero() { vec.clear(); }
 
@@ -359,6 +380,14 @@ class Vector<T, true> {
     inline T dot(const DenseVector<T>& b) const { return b.dot(*this); }
 
     T dot_with_intcpt(const DenseVector<T>& b) const;
+
+    inline T norm_sqr() const {
+        return (*this).dot(*this);
+    }
+
+    inline T norm() const {
+        return std::sqrt(norm_sqr());
+    }
 
     template <bool is_sparse>
     inline T euclid_dist(const DenseVector<T>& b) const {

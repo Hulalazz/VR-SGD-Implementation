@@ -156,8 +156,8 @@ template <typename T>
 DenseVector<T>& DenseVector<T>::operator-=(const SparseVector<T>& b) {
     assert(feature_num == b.get_feature_num());
 
-    for (const FeaValPair<T>& entry : b.vec) {
-        vec[entry.fea] -= entry.val;
+    for (auto it = b.begin_feaval(); it != b.end_feaval(); ++it) {
+        vec[it->fea] -= it->val;
     }
 
     return *this;
