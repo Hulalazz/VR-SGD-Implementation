@@ -3,16 +3,18 @@
 
 namespace VRSGD {
 
-template <bool is_sparse>
+template <typename VectorDataT>
 class LassoRegression {
  public:
-    LassoRegression(const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points, double lambda)
+    typedef VectorDataT VectorGradT;
+
+    LassoRegression(const std::vector<VRSGD::LabeledPoint<VectorDataT, double>>& data_points, double lambda)
         : data_points(data_points),
           lambda(lambda) {
         data_num = data_points.size();
     }
 
-    double cost_func(const VRSGD::DenseVector<double>& w) {
+    double cost_func(const VectorXd& w) const {
         double res = 0;
         for (auto& data_point : data_points) {
             //double tmp = w.dot_with_intcpt(data_point.x) - data_point.y;
@@ -25,8 +27,8 @@ class LassoRegression {
         return res;
     }
 
-    VRSGD::Vector<double, is_sparse> grad_func(const VRSGD::DenseVector<double>& w) {
-        Vector<double, false> res;
+    VectorDataT grad_func(const VectorXd& w) const {
+        VectorXd res;
 
         for (const auto& data_point : data_points) {
             //res += data_point.x.scalar_multiple_with_intcpt(w.dot_with_intcpt(data_point.x) - data_point.y);
@@ -36,22 +38,24 @@ class LassoRegression {
         return res;
     }
 
-    inline VRSGD::Vector<double, is_sparse> grad_func(const VRSGD::DenseVector<double>& w, int idx) {
+    template <typename Derived>
+    inline auto grad_func(const MatrixBase<Derived>& w, int idx) const {
         auto& data_point = data_points[idx];
         //return data_point.x.scalar_multiple_with_intcpt(w.dot_with_intcpt(data_point.x) - data_point.y);
         return data_point.x * (w.dot(data_point.x) - data_point.y);
     }
 
-    inline DenseVector<double> prox_func(DenseVector<double> y, double alpha, double lambda) {
+    template <typename Derived>
+    inline auto prox_func(const MatrixBase<Derived>& y, double alpha, double lambda) const {
         return prox_l1(y, alpha, lambda);
     }
 
-    int size() {
+    int size() const {
         return data_num;
     }
 
  protected:
-    const std::vector<LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points;
+    const std::vector<LabeledPoint<VectorDataT, double>>& data_points;
     int data_num;
     double lambda;
 };

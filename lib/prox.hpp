@@ -6,50 +6,39 @@
 
 namespace VRSGD {
 
-template<typename T, bool is_sparse>
-inline Vector<T, is_sparse> prox_l2(const Vector<T, is_sparse>& y, T alpha, T lambda) {
+template <typename VectorT, typename T>
+inline auto prox_l2(const VectorT& y, T alpha, T lambda) {
     return y / (1 + alpha * lambda);
 }
 
-template <typename T, bool is_sparse>
-Vector<T, is_sparse> prox_l1(const Vector<T, is_sparse>& y, T lambda) {
-    Vector<T, is_sparse> res(y.get_feature_num());
-
-    for (auto it = y.begin_feaval(); it != y.end_feaval(); ++it) {
-        const auto&& entry = *it;
-
-        if (std::abs(entry.val) <= lambda) {
-            res.set(entry.fea, 0);
-        } else if (entry.val > 0){
-            res.set(entry.fea, entry.val - lambda);
-        } else {
-            res.set(entry.fea, entry.val + lambda);
-        }
-    }
-
-    return res;
-}
-
 template <typename T>
-T prox_l1(T y, T lambda) {
-    if (std::abs(y) <= lambda) {
-        return 0;
-    } else if (y > 0) {
-        return y - lambda;
-    } else {
-        return y + lambda;
-    }
+inline T prox_l1(T y, T lambda) {
+    return std::max(0., y - lambda) + std::min(0., y + lambda);
 }
 
-template <typename T, bool is_sparse>
-inline Vector<T, is_sparse> prox_l1(const Vector<T, is_sparse>& y, T alpha, T lambda) {
+template<typename Scalar>
+struct CwiseProxL1Op {
+    CwiseProxL1Op(const Scalar& lambda) : lambda(lambda) {}
+    inline const Scalar operator()(const Scalar& y) const {
+        return prox_l1(y, lambda);
+    }
+    Scalar lambda;
+};
+
+template <typename VectorT, typename T>
+auto prox_l1(const VectorT& y, T lambda) {
+    return y.unaryExpr(CwiseProxL1Op<T>(lambda));
+}
+
+template <typename VectorT, typename T>
+inline auto prox_l1(const VectorT& y, T alpha, T lambda) {
     return prox_l1(y, alpha * lambda);
 }
 
-template <typename T, bool is_sparse>
+/*template <typename T, bool is_sparse>
 inline Vector<T, is_sparse> prox_identity(const Vector<T, is_sparse>& y, T, T) {
     return y;
-}
+}*/
 
 }
 

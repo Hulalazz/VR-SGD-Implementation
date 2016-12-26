@@ -3,6 +3,7 @@
 #include "vector.hpp"
 
 #include <boost/tokenizer.hpp>
+#include <Eigen/Dense>
 
 #include <vector>
 #include <fstream>
@@ -10,8 +11,10 @@
 
 namespace VRSGD {
 
-template<typename T, typename U, bool is_sparse>
-void read_libsvm(std::vector<LabeledPoint<Vector<T, is_sparse>, U>>& data_points, std::string filename, int feature_num) {
+using Eigen::VectorXd;
+
+template <typename VectorDataT, typename LabelT>
+void read_libsvm(std::vector<LabeledPoint<VectorDataT, LabelT>>& data_points, std::string filename, int feature_num) {
     std::fstream fs(filename, std::fstream::in);
 
     while (!fs.eof()) {
@@ -21,7 +24,7 @@ void read_libsvm(std::vector<LabeledPoint<Vector<T, is_sparse>, U>>& data_points
             continue;
         }
 
-        LabeledPoint<Vector<T, is_sparse>, U> data_point(Vector<T, is_sparse>(feature_num), 0);
+        LabeledPoint<VectorDataT, LabelT> data_point(VectorDataT(feature_num), 0);
 
         boost::char_separator<char> sep(" \t");
         boost::tokenizer<boost::char_separator<char>> tok(line, sep);
@@ -39,7 +42,7 @@ void read_libsvm(std::vector<LabeledPoint<Vector<T, is_sparse>, U>>& data_points
                 it++;
                 double val = std::stod(*it);
 
-                data_point.x.set(fea, val);
+                data_point.x.coeffRef(fea, 0) = val;
             }
         }
 

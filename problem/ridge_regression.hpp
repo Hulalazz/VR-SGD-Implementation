@@ -3,16 +3,18 @@
 
 namespace VRSGD {
 
-template <bool is_sparse>
+template <typename VectorDataT>
 class RidgeRegression {
  public:
-    RidgeRegression(const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points, double lambda)
+    typedef VectorXd VectorGradT;
+
+    RidgeRegression(const std::vector<VRSGD::LabeledPoint<VectorDataT, double>>& data_points, double lambda)
         : data_points(data_points),
           lambda(lambda) {
         data_num = data_points.size();
     }
 
-    double cost_func(const VRSGD::DenseVector<double>& w) {
+    double cost_func(const VectorXd& w) const {
         double res = 0;
         for (auto& data_point : data_points) {
             //double tmp = w.dot_with_intcpt(data_point.x) - data_point.y;
@@ -20,52 +22,57 @@ class RidgeRegression {
             res += tmp * tmp / (2 * data_points.size());
         }
 
-        res += lambda / 2. * w.norm_sqr();
+        res += lambda / 2. * w.squaredNorm();
 
         return res;
     }
 
-    VRSGD::DenseVector<double> grad_func(const VRSGD::DenseVector<double>& w) {
-        Vector<double, false> res;
+    VectorXd grad_func(const VectorXd& w) const {
+        VectorXd res;
 
         for (const auto& data_point : data_points) {
-            //res += data_point.x.scalar_multiple_with_intcpt(w.dot_with_intcpt(data_point.x) - data_point.y);
+            //res += data_point.x.scalar_multiple_with_intcpt(w.dot_with_intcpt(data_point.x) - data_point.y) / data_num;
             res += data_point.x * (w.dot(data_point.x) - data_point.y) / data_num;
         }
+        
+        res += lambda * w;
 
-        return res + lambda * w;
+        return res;
     }
 
-    inline VRSGD::DenseVector<double> grad_func(const VRSGD::DenseVector<double>& w, int idx) {
+    template <typename Derived>
+    inline auto grad_func(const MatrixBase<Derived>& w, int idx) const {
         auto& data_point = data_points[idx];
         //return data_point.x.scalar_multiple_with_intcpt(w.dot_with_intcpt(data_point.x) - data_point.y);
         return data_point.x * (w.dot(data_point.x) - data_point.y) + lambda * w;
     }
 
-    DenseVector<double> prox_func(DenseVector<double> y, double, double) {
+    const VectorXd& prox_func(const VectorXd& y, double, double) const {
         return y;
     }
 
-    int size() {
+    int size() const {
         return data_num;
     }
 
  protected:
-    const std::vector<LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points;
+    const std::vector<LabeledPoint<VectorDataT, double>>& data_points;
     int data_num;
     double lambda;
 };
 
-template <bool is_sparse>
+template <typename VectorDataT>
 class RidgeRegressionProx {
  public:
-    RidgeRegressionProx(const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points, double lambda)
+    typedef VectorDataT VectorGradT;
+
+    RidgeRegressionProx(const std::vector<VRSGD::LabeledPoint<VectorDataT, double>>& data_points, double lambda)
         : data_points(data_points),
           lambda(lambda) {
         data_num = data_points.size();
     }
 
-    double cost_func(const VRSGD::DenseVector<double>& w) {
+    double cost_func(const VectorXd& w) const {
         double res = 0;
         for (auto& data_point : data_points) {
             //double tmp = w.dot_with_intcpt(data_point.x) - data_point.y;
@@ -73,13 +80,13 @@ class RidgeRegressionProx {
             res += tmp * tmp / (2 * data_points.size());
         }
 
-        res += lambda / 2. * w.norm_sqr();
+        res += lambda / 2. * w.squaredNorm();
 
         return res;
     }
 
-    VRSGD::DenseVector<double> grad_func(const VRSGD::DenseVector<double>& w) {
-        Vector<double, false> res;
+    VectorXd grad_func(const VectorXd& w) const {
+        VectorXd res;
 
         for (const auto& data_point : data_points) {
             //res += data_point.x.scalar_multiple_with_intcpt(w.dot_with_intcpt(data_point.x) - data_point.y);
@@ -89,13 +96,15 @@ class RidgeRegressionProx {
         return res;
     }
 
-    inline VRSGD::DenseVector<double> grad_func(const VRSGD::DenseVector<double>& w, int idx) {
+    template <typename Derived>
+    inline auto grad_func(const MatrixBase<Derived>& w, int idx) const {
         auto& data_point = data_points[idx];
         //return data_point.x.scalar_multiple_with_intcpt(w.dot_with_intcpt(data_point.x) - data_point.y);
         return data_point.x * (w.dot(data_point.x) - data_point.y);
     }
 
-    inline DenseVector<double> prox_func(const DenseVector<double>& y, double alpha, double lambda) {
+    template <typename Derived>
+    inline auto prox_func(const MatrixBase<Derived>& y, double alpha, double lambda) const {
         return prox_l2(y, alpha, lambda);
     }
 
@@ -104,7 +113,7 @@ class RidgeRegressionProx {
     }
 
  private:
-    const std::vector<LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points;
+    const std::vector<LabeledPoint<VectorDataT, double>>& data_points;
     int data_num;
     double lambda;
 };

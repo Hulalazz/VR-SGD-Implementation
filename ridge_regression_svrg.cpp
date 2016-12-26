@@ -25,11 +25,12 @@ double calc_L(const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_spa
 }
 
 int main() {
-    const bool is_sparse = true;
+    typedef VRSGD::VectorXd VectorDataType;
+    //typedef VRSGD::SparseVectorXd VectorDataType;
 
-    std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>> data_points;
+    std::vector<VRSGD::LabeledPoint<VectorDataType, double>> data_points;
 
-    /*const int feature_num = 54;
+    const int feature_num = 54;
     //const double alpha = 0.000961;
     const double alpha = 0.4;
     //const double lambda = 1. / feature_num;
@@ -43,9 +44,9 @@ int main() {
         } else {
             data_point.y = 1;
         }
-    }*/
+    }
 
-    const int feature_num = 47236;
+    /*const int feature_num = 47236;
     //const double alpha = 0.000961;
     const double alpha = 0.4;
     //const double lambda = 1. / feature_num;
@@ -54,7 +55,7 @@ int main() {
     VRSGD::read_libsvm(data_points, "./datasets/rcv1_train.binary", feature_num);
     for (auto& data_point : data_points) {
         data_point.x /= data_point.x.norm();
-    }
+    }*/
 
     /*const int feature_num = 14;
     const double alpha = 0.000642;
@@ -72,12 +73,12 @@ int main() {
         data_point.y /= max_y;
     }*/
 
-    VRSGD::RidgeRegression<is_sparse> ridge_regrssion(data_points, lambda);
+    VRSGD::RidgeRegression<VectorDataType> ridge_regrssion(data_points, lambda);
 
     //double L = calc_L(data_points);
     //printf("L: %.15lf\n", L);
 
-    VRSGD::svrg_train<double, double, is_sparse>(
+    VRSGD::svrg_train(
             ridge_regrssion,
             alpha,
             lambda,

@@ -16,10 +16,41 @@
 
 #pragma once
 
+#define EIGEN_MATRIXBASE_PLUGIN "lib/eigen_vector_plugin.hpp"
+
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
+
 #include <cmath>
 #include <vector>
 
 namespace VRSGD {
+
+using Eigen::VectorXd;
+using SparseVectorXd = Eigen::SparseVector<double>;
+using Eigen::MatrixBase;
+
+template <typename _Scalar, int _Flags = 0, typename _StorageIndex = int>
+class InnerIterator;
+
+template <typename XprType, int, typename>
+class InnerIterator : public Eigen::InnerIterator<XprType> {
+ protected:
+    typedef typename Eigen::internal::traits<XprType>::Scalar Scalar;
+ public:
+    InnerIterator(const XprType &xpr, const Eigen::Index &outerId) : Eigen::InnerIterator<XprType>(xpr, outerId) {}
+    EIGEN_STRONG_INLINE Scalar& valueRef() {
+        return this->m_eval.coeffRef(this->row(), this->col());
+    }
+};
+
+template <typename _Scalar, int _Flags, typename _StorageIndex>
+class InnerIterator<Eigen::SparseVector<_Scalar, _Flags, _StorageIndex>> : public Eigen::SparseVector<_Scalar, _Flags, _StorageIndex>::InnerIterator {
+ protected:
+    typedef Eigen::SparseVector<_Scalar> XprType;
+ public:
+    InnerIterator(const XprType &xpr, const Eigen::Index &outerId) : Eigen::SparseVector<_Scalar, _Flags, _StorageIndex>::InnerIterator(xpr, outerId) {}
+};
 
 template <typename T, bool is_sparse>
 class Vector;

@@ -6,10 +6,8 @@
 
 #include <cmath>
 
-using namespace std::placeholders;
-
-template<bool is_sparse>
-double calc_L(const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>>& data_points) {
+template <typename VectorDataT>
+double calc_L(const std::vector<VRSGD::LabeledPoint<VectorDataT, double>>& data_points) {
     //double max_L = data_points[0].x.norm_sqr() + 1.;
     double max_L = data_points[0].x.norm_sqr();
 
@@ -25,7 +23,8 @@ double calc_L(const std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_spa
 }
 
 int main() {
-    const bool is_sparse = true;
+    typedef VRSGD::VectorXd VectorDataT;
+    //typedef VRSGD::SparseVectorXd VectorDataT;
 
     const int feature_num = 54;
     //const double alpha = 0.000961;
@@ -33,7 +32,7 @@ int main() {
     //const double lambda = 1. / feature_num;
     const double lambda = 1e-4;
 
-    std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>> data_points;
+    std::vector<VRSGD::LabeledPoint<VectorDataT, double>> data_points;
     VRSGD::read_libsvm(data_points, "./datasets/covtype.binary", feature_num);
     int i = 0;
     for (auto& data_point : data_points) {
@@ -51,7 +50,7 @@ int main() {
     const double alpha = 0.000642;
     const double lambda = 1. / feature_num;
 
-    std::vector<VRSGD::LabeledPoint<VRSGD::Vector<double, is_sparse>, double>> data_points;
+    std::vector<VRSGD::LabeledPoint<VectorDataT, double>> data_points;
     VRSGD::read_libsvm(data_points, "./datasets/housing_scale", feature_num);
     double max_y = 0;
     for (auto& data_point : data_points) {
@@ -63,12 +62,12 @@ int main() {
         data_point.y /= max_y;
     }*/
 
-    VRSGD::RidgeRegression<is_sparse> ridge_regrssion(data_points, lambda);
+    VRSGD::RidgeRegression<VectorDataT> ridge_regrssion(data_points, lambda);
 
     //double L = calc_L(data_points);
     //printf("L: %.15lf\n", L);
 
-    VRSGD::saga_train<double, double, is_sparse>(
+    VRSGD::saga_train(
             ridge_regrssion,
             alpha,
             lambda,
