@@ -108,6 +108,16 @@ class RidgeRegressionProx {
         return prox_l2(y, alpha, lambda);
     }
 
+    inline double prox_func(double w, const double& mu_tidle, double alpha, double lambda, int tau) const {
+        double beta = 1. / (1. + alpha * lambda);
+        double beta_pow_tau = std::pow(beta, tau);
+        return beta_pow_tau * w - alpha * beta / (1 - beta) * (1 - beta_pow_tau) * mu_tidle;
+    }
+
+    inline const VectorDataT& data(int idx) const {
+        return data_points[idx].x;
+    }
+
     int size() {
         return data_num;
     }

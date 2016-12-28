@@ -1,5 +1,5 @@
 #include <lib/utils.hpp>
-#include <algo/svrg.hpp>
+#include <algo/svrg_lazy_update.hpp>
 #include <problem/ridge_regression.hpp>
 
 #include <cmath>
@@ -21,12 +21,11 @@ double calc_L(const std::vector<VRSGD::LabeledPoint<VectorDataT, double>>& data_
 }
 
 int main() {
-    typedef VRSGD::VectorXd VectorDataT;
-    //typedef VRSGD::SparseVectorXd VectorDataT;
+    typedef VRSGD::SparseVectorXd VectorDataT;
 
     std::vector<VRSGD::LabeledPoint<VectorDataT, double>> data_points;
 
-    const int feature_num = 54;
+    /*const int feature_num = 54;
     //const double alpha = 0.000961;
     const double alpha = 0.4;
     //const double lambda = 1. / feature_num;
@@ -40,9 +39,9 @@ int main() {
         } else {
             data_point.y = 1;
         }
-    }
+    }*/
 
-    /*const int feature_num = 47236;
+    const int feature_num = 47236;
     //const double alpha = 0.000961;
     const double alpha = 0.4;
     //const double lambda = 1. / feature_num;
@@ -51,7 +50,7 @@ int main() {
     VRSGD::read_libsvm(data_points, "./datasets/rcv1_train.binary", feature_num);
     for (auto& data_point : data_points) {
         data_point.x /= data_point.x.norm();
-    }*/
+    }
 
     /*const int feature_num = 14;
     const double alpha = 0.000642;
@@ -69,12 +68,12 @@ int main() {
         data_point.y /= max_y;
     }*/
 
-    VRSGD::RidgeRegression<VectorDataT> ridge_regrssion(data_points, lambda);
+    VRSGD::RidgeRegressionProx<VectorDataT> ridge_regrssion(data_points, lambda);
 
     //double L = calc_L(data_points);
     //printf("L: %.15lf\n", L);
 
-    VRSGD::svrg_train(
+    VRSGD::svrg_lazy_update_train(
             ridge_regrssion,
             alpha,
             lambda,

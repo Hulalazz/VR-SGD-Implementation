@@ -52,6 +52,84 @@ class InnerIterator<Eigen::SparseVector<_Scalar, _Flags, _StorageIndex>> : publi
     InnerIterator(const XprType &xpr, const Eigen::Index &outerId) : Eigen::SparseVector<_Scalar, _Flags, _StorageIndex>::InnerIterator(xpr, outerId) {}
 };
 
+template <typename T>
+class ChangeStore {
+ public:
+    ChangeStore(int size) {
+        store.reserve(size);
+    }
+
+    template <typename Other>
+    ChangeStore& operator+=(const Other& other) {
+        for (typename Other::InnerIterator it(other); it; ++it) {
+            store.emplace_back(it.index(), it.value());
+        }
+    }
+
+    template <typename Other>
+    ChangeStore& operator-=(const Other& other) {
+        for (typename Other::InnerIterator it(other); it; ++it) {
+            store.emplace_back(it.index(), -it.value());
+        }
+    }
+
+    ChangeStore& operator*=(const T& other) {
+        for (auto& entry : store) {
+            entry.second *= other;
+        }
+    }
+
+    ChangeStore& operator/=(const T& other) {
+        for (auto& entry : store) {
+            entry.second /= other;
+        }
+    }
+
+    inline auto begin() {
+        return store.begin();
+    }
+
+    inline auto begin() const {
+        return store.begin();
+    }
+
+    inline auto end() {
+        return store.end();
+    }
+
+    inline auto end() const {
+        return store.end();
+    }
+
+    inline void clear() {
+        store.clear();
+    }
+
+    inline void reserve(int size) {
+        store.reserve(size);
+    }
+ private:
+    std::vector<std::pair<int, T>> store;
+};
+
+template <typename Derived, typename T>
+MatrixBase<Derived>& operator+=(MatrixBase<Derived>& vec, const ChangeStore<T>& change_store) {
+    for (const auto& entry : change_store) {
+        vec[entry.first] += entry.second;
+    }
+
+    return vec;
+}
+
+template <typename Derived, typename T>
+MatrixBase<Derived>& operator-=(MatrixBase<Derived>& vec, const ChangeStore<T>& change_store) {
+    for (const auto& entry : change_store) {
+        vec[entry.first] -= entry.second;
+    }
+
+    return vec;
+}
+
 template <typename T, bool is_sparse>
 class Vector;
 

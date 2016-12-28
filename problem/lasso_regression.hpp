@@ -1,6 +1,8 @@
 #include <lib/vector.hpp>
 #include <lib/prox.hpp>
 
+#include <algorithm>
+
 namespace VRSGD {
 
 template <typename VectorDataT>
@@ -48,6 +50,37 @@ class LassoRegression {
     template <typename Derived>
     inline auto prox_func(const MatrixBase<Derived>& y, double alpha, double lambda) const {
         return prox_l1(y, alpha, lambda);
+    }
+
+    inline double prox_func(double w, const double& mu_tidle, double alpha, double lambda, int tau) const {
+        w -= alpha * tau * mu_tidle;
+
+        int positive;
+        if (w < 0) {
+            positive = -1;
+            w *= -1;
+        } else {
+            positive = 1;
+        }
+
+        if (w > 0) {
+            int x = std::min((int)(w / lambda), tau);
+            if (x >= tau) {
+                return positive * (w - tau * lambda);
+            } else {
+                double tmp1 = w - x * lambda;
+                double tmp2 = tmp1 - lambda;
+                if (std::abs(tmp1) < std::abs(tmp2)) {
+                    return positive * tmp1;
+                } else {
+                    return positive * tmp2;
+                }
+            }
+        }
+    }
+
+    inline const VectorDataT& data(int idx) const {
+        return data_points[idx].x;
     }
 
     int size() const {
