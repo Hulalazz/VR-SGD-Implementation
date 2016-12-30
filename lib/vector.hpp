@@ -85,6 +85,12 @@ class ChangeStore {
         }
     }
 
+    VectorXd eval(int feature_num) {
+        VectorXd vec(feature_num);
+        vec += *this;
+        return vec;
+    }
+
     inline auto begin() {
         return store.begin();
     }

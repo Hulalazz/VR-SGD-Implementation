@@ -8,10 +8,23 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 namespace VRSGD {
 
 using Eigen::VectorXd;
+
+double fast_pow(double a, unsigned int b);
+
+class Timer {
+ public:
+    Timer() : start(std::chrono::high_resolution_clock::now()) {}
+    double sec_elapsed() {
+        return std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count();
+    }
+ private:
+    std::chrono::time_point<std::chrono::system_clock> start;
+};
 
 template <typename VectorDataT, typename LabelT>
 void read_libsvm(std::vector<LabeledPoint<VectorDataT, LabelT>>& data_points, std::string filename, int feature_num) {

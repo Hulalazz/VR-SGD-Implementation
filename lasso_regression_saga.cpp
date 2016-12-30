@@ -5,6 +5,7 @@
 #include <problem/lasso_regression.hpp>
 
 #include <cmath>
+#include <iostream>
 
 template <typename VectorDataT>
 double calc_L(const std::vector<VRSGD::LabeledPoint<VectorDataT, double>>& data_points) {
@@ -62,6 +63,8 @@ int main() {
         data_point.y /= max_y;
     }*/
 
+    VRSGD::Timer timer;
+
     VRSGD::LassoRegression<VectorDataT> lasso_regrssion(data_points, lambda);
 
     //double L = calc_L(data_points);
@@ -76,5 +79,7 @@ int main() {
             //feature_num + 1,
             feature_num,
             data_points.size());
+
+    std::cout << "Time elapsed: " << timer.sec_elapsed() << "s" << std::endl;
 }
 

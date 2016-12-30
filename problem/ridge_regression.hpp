@@ -1,5 +1,6 @@
 #include <lib/vector.hpp>
 #include <lib/prox.hpp>
+#include <lib/utils.hpp>
 
 namespace VRSGD {
 
@@ -110,7 +111,7 @@ class RidgeRegressionProx {
 
     inline double prox_func(double w, const double& mu_tidle, double alpha, double lambda, int tau) const {
         double beta = 1. / (1. + alpha * lambda);
-        double beta_pow_tau = std::pow(beta, tau);
+        double beta_pow_tau = fast_pow(beta, tau);
         return beta_pow_tau * w - alpha * beta / (1 - beta) * (1 - beta_pow_tau) * mu_tidle;
     }
 
@@ -122,7 +123,7 @@ class RidgeRegressionProx {
         return data_num;
     }
 
- private:
+ protected:
     const std::vector<LabeledPoint<VectorDataT, double>>& data_points;
     int data_num;
     double lambda;
